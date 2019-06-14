@@ -1,0 +1,266 @@
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<style>
+		
+			canvas {
+				border:1px solid #d3d3d3;
+				background-color: #f1f1f1;
+			}
+			html, body {
+			  width:  100%;
+			  height: 100%;
+			  margin: 0;
+			}
+			
+		</style>
+		
+	</head>
+	
+	<body onload="startGame()">
+		<script>
+			var myDog, time, myBackground, a, b, c, radius, left, right, top, bottom, otherLeft, otherRight, otherBottom, otherTop, crash, ctx, userName;
+			
+			var obstacles = []; //defining multiple obstacles
+			var randomInterval = Math.floor((Math.random() * 150) + 100);
+			
+			function startGame() {
+				
+				myDog = new component(130, 80, "huskyDrawing.png", 20, 180, "image"); //handrawn doggy
+				myBackground = new component(1510, 730, "snow.jpg", 0, 0, "backgroundPic"); //1510 px wide, 730 px high, 0 px to the right and left
+				obstacles.push(new component(100, 100, "SunnySide_ShrubFlowers.png", 300, 350, "obstacle")); //inserts obstacle into array
+				time = new component("30px", "Consolas", "black", 30, 30, "text");
+				myGameArea.start();		
+				
+			}
+			
+			
+			var myGameArea = {
+			
+				canvas : document.createElement("canvas"),
+				
+				start : function() { //creates canvas and starts game
+				
+					this.canvas.width = window.innerWidth;
+					this.canvas.height = window.innerHeight;
+					this.context = this.canvas.getContext("2d");			
+					document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+					this.frameNo = 0; //to generate more obstacles at a given frame rate
+					this.interval = setInterval(updateGameArea, 20);
+					
+				},
+				
+				clear : function() {
+				
+					this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+					
+				},
+				
+				stop : function() { //ends game, will be used in the crash function
+				
+					clearInterval(this.interval);
+					
+				}
+				
+			}
+			
+			function component(width, height, photo, x, y, type) {
+			
+				this.type = type;
+				
+				 if (type == "image" || type == "backgroundPic"||type == "obstacle") {
+				 
+					this.image = new Image();
+					this.image.src = photo;
+					
+				 }
+				this.width = width;
+				this.height = height;
+				this.speedX = 0;
+				this.speedY = 0;    
+				this.x = x;
+				this.y = y; 
+				this.score = 0;
+
+				
+				this.update = function() { //creates update which will later on be used when updating/drawing number of obstacles, background picture and/or score
+				
+					ctx = myGameArea.context;
+					if (type == "image"||type == "backgroundPic"||type == "obstacle") {
+							
+							ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+							
+							if (type == "backgroundPic") {
+							
+								ctx.drawImage(this.image, this.x + this.width, this.y, this.width, this.height);
+							
+							}
+								  
+					} else if (this.type == "text") {
+						
+							ctx.font = this.width + " " + this.height;
+							ctx.fillStyle = photo;
+							ctx.fillText(this.text, this.x, this.y);
+							
+					} else {
+						
+						ctx.fillStyle = photo;
+						ctx.fillRect(this.x, this.y, this.width, this.height);
+						
+					}
+					
+				} 
+					
+				this.newPos = function() {
+				
+					this.x += this.speedX;
+					this.y += this.speedY; 
+					
+					if (this.type == "backgroundPic"||this.type == "obstacle") {
+					
+					   if (this.x == -(this.width)) {
+					  
+							this.x = 0;
+						
+					    }
+					  
+					}	
+				}
+				   this.crash = function(otherobj) {
+					var myleft = this.x;
+					var myright = this.x + (this.width);
+					var mytop = this.y;
+					var mybottom = this.y + (this.height);
+					var otherleft = otherobj.x;
+					var otherright = otherobj.x + (otherobj.width);
+					var othertop = otherobj.y;
+					var otherbottom = otherobj.y + (otherobj.height);
+					var crash = true;
+					if ((mybottom < othertop) ||
+					(mytop > otherbottom) ||
+					(myright < otherleft) ||
+					(myleft > otherright)) {
+					  crash = false;
+					}
+					return crash;
+				  }
+			}
+				
+				
+			function everyInterval(n) {
+			
+			    if ((myGameArea.frameNo / n) % 1 == 0) {
+		
+					return true;
+				
+			    }
+			  
+			  return false;
+			  
+			}
+			
+			function updateGameArea() {
+		
+				var distance, height, gap, minHeight, maxHeight, minGap, maxGap, y, width, minWidth, minHeight;
+				for (var i = 0; i < obstacles.length; i += 1) {
+
+					if (myDog.crash(obstacles[i])) {
+						userName = localStorage.getItem("name"); //intervariable for ICSgame.html page
+						alert("You lost :(...Better luck next time! Thank you for playing, " + userName + "!");
+						myGameArea.stop();
+
+					    return;
+					  
+					} 
+					
+				}
+					myGameArea.clear(); //so that the components do not leave a trail behind on canvas
+					myGameArea.frameNo += 1;
+					myBackground.speedX = -1;
+					myBackground.newPos();    //so the background image is continuous
+					myBackground.update();
+
+						if ((myGameArea.frameNo == 1)|| (everyInterval(randomInterval))) { //so that the obstacle appears after certain intervals
+						
+						distance = myGameArea.frameNo * 2;
+							minHeight = 10;
+							maxHeight = 50;
+							height = Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight); //randomizes height of the component
+							minGap = 140;
+							maxGap = 150;
+							gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
+							obstacles.push(new component(200, distance - height - gap, "SunnySide_ShrubFlowers.png", distance, height + gap, "obstacle"));//adds component properties to the end of the array
+				
+						}
+						
+						for (var w = 0; w < obstacles.length; w += 1) {
+			
+							obstacles[w].distance += 1; //chooses which obstacles property to display
+							obstacles[w].update(); //updates and adds new one to canvas
+							
+						}
+								
+				time.text = "SCORE: " + myGameArea.frameNo;
+				time.update();
+				myDog.newPos();    
+				myDog.update();
+				
+			}	
+			
+		
+			
+			function moveup() {
+			
+				myDog.speedY = -3; 
+				
+			}
+
+			function movedown() {
+			
+				myDog.speedY = 3; 
+				
+			}
+
+			function moveleft() {
+			
+				myDog.speedX = -3; 
+				
+			}
+
+			function moveright() {
+			
+				myDog.speedX = 3; 
+				
+			}
+			
+			document.onkeydown = function(evt) { //connecting the dog to arrows on keyboard
+			
+				evt = evt || window.event; 
+				
+				switch (evt.keyCode) { 
+				
+					case 37:
+					moveleft(); 
+					break; 
+					 
+					case 38:
+					moveup(); 
+					break;
+					
+					case 39:
+					moveright(); 
+					break; 
+					
+					case 40:
+					movedown(); 
+					break;
+				
+				} 
+				
+			};	
+			
+
+	
+		</script>
+	</body>
+</html>
