@@ -1,16 +1,22 @@
 <html>
+
 	<head>
+	
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		
 		<style>
 		
 			canvas {
+			
 				border:1px solid #d3d3d3;
 				background-color: #f1f1f1;
 				height:100%;
 				width 100%;
+				
 			}
 			
 			button {
+			
 				margin:13px;
 				color:black;
 				height:40px;
@@ -25,9 +31,10 @@
 	</head>
 	
 	<body onload="startGame()">
+	
 		<script>
+		
 			var myDog, time, myBackground, obstacles, a, b, c, radius, left, right, top, bottom, otherLeft, otherRight, otherBottom, otherTop, crash, ctx; 
-
 			obstacles = []; //defining multiple obstacles
 				
 			function startGame() {
@@ -73,12 +80,13 @@
 			
 				this.type = type;
 				
-				 if (type == "image" || type == "backgroundPic"||type == "obstacle") {
+				if (type == "image" || type == "backgroundPic"||type == "obstacle") {
 				 
 					this.image = new Image();
 					this.image.src = photo;
 					
-				 }
+				}
+				
 				this.width = width;
 				this.height = height;
 				this.speedX = 0;
@@ -86,24 +94,25 @@
 				this.x = x;
 				this.y = y; 
 				this.score = 0;
-
 				
 				this.update = function() {
 				
 					ctx = myGameArea.context;
 					if (type == "image"||type == "backgroundPic"||type == "obstacle") {
 							
+						ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+							
+						if (type == "backgroundPic"||type == "obstacle") {
+						
 							ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
 							
-							if (type == "backgroundPic"||type == "obstacle") {
-								ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-							}
+						}
 								  
 					} else if (this.type == "text") {
 						
-							ctx.font = this.width + " " + this.height;
-							ctx.fillStyle = photo;
-							ctx.fillText(this.text, this.x, this.y);
+						ctx.font = this.width + " " + this.height;
+						ctx.fillStyle = photo;
+						ctx.fillText(this.text, this.x, this.y);
 							
 					} else {
 						
@@ -129,7 +138,9 @@
 					  
 					}	
 				}
-				   this.crashWith = function(otherobj) {
+			   
+				this.crashWith = function(otherobj) {
+				
 					var myleft = this.x;
 					var myright = this.x + (this.width);
 					var mytop = this.y;
@@ -139,11 +150,16 @@
 					var othertop = otherobj.y;
 					var otherbottom = otherobj.y + (otherobj.height);
 					var crash = true;
+				
 					if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
-					  crash = false;
+				
+						crash = false;
 					}
+					
 					return crash;
-				  }
+					
+			  }
+			  
 			}
 				
 			
@@ -152,48 +168,54 @@
 				var x, height, interVal, minHeight, maxHeight, mininterVal, maxinterVal, y, width, minWidth, minHeight;
 				
 				for (var i = 0; i < obstacles.length; i += 1) {
-
+				
 					if (myDog.crashWith(obstacles[i])) {
+					
 						alert("You lost");
+						
 						myGameArea.stop();
 					    return;
 					  
 					} 
 					
 				}
-					myGameArea.clear(); //so that the components do not leave a trail behind on canvas
-					myGameArea.frameNo += 1;
-					myBackground.speedX = -1;
-					myBackground.newPos();    //so the background image is continuous
-					myBackground.update();
+				
+				myGameArea.clear(); //so that the components do not leave a trail behind on canvas
+				myGameArea.frameNo += 1;
+				myBackground.speedX = -1;
+				myBackground.newPos();    //so the background image is continuous
+				myBackground.update();
 					
-						if ((myGameArea.frameNo == 1 )|| (everyInterval(120))) {
-							x = myGameArea.canvas.width
-							minHeight = 20;
-							maxHeight = 80;
-							height = Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight);
-							mininterVal = 100;
-							maxinterVal = 200;
-							interVal = Math.floor(Math.random()*(maxinterVal-mininterVal+1)+mininterVal);
-							obstacles[obstacles.length] = (new component(10, height, "SunnySide_Shrub.png", x, 0, "obstacle")); //adds component properties to the end of the array
-							obstacles[obstacles.length] = (new component(10, x - height - interVal, "SunnySide_Shrub.png", x, height + interVal));
-
-						}
-						
-						for (var w = 0; w < obstacles.length; w += 1) {
-			
-							obstacles[w].x += 1; //chooses which obstacles property to display
-							obstacles[w].update(); //updates and adds new one to canvas
-							
-						}
+				if ((myGameArea.frameNo == 1 )|| (everyInterval(120))) {
+				
+					x = myGameArea.canvas.width
+					minHeight = 20;
+					maxHeight = 80;
+					height = Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight);
+					mininterVal = 100;
+					maxinterVal = 200;
+					interVal = Math.floor(Math.random()*(maxinterVal-mininterVal+1)+mininterVal);
+					
+					obstacles[obstacles.length] = (new component(10, height, "SunnySide_Shrub.png", x, 0, "obstacle")); //adds component properties to the end of the array
+					obstacles[obstacles.length] = (new component(10, x - height - interVal, "SunnySide_Shrub.png", x, height + interVal));
+					
+				}
+				
+				for (var w = 0; w < obstacles.length; w += 1) {
+	
+					obstacles[w].x += 1; //chooses which obstacles property to display
+					obstacles[w].update(); //updates and adds new one to canvas
+					
+				}
+				
 				time.text = "SCORE: " + myGameArea.frameNo;
 				time.update();
+				
 				//obstacles.update();
 				myDog.newPos();    
 				myDog.update();
 				
 			}	
-			
 			
 			function everyInterval(n) {
 			
@@ -212,19 +234,19 @@
 				myDog.speedY = -2; 
 				
 			}
-
+			
 			function movedown() {
 			
 				myDog.speedY = 2; 
 				
 			}
-
+			
 			function moveleft() {
 			
 				myDog.speedX = -2; 
 				
 			}
-
+			
 			function moveright() {
 			
 				myDog.speedX = 2; 
@@ -255,8 +277,11 @@
 				
 				} 
 				
-			};			
+			};		
+			
 		</script>
+		
 	</body>
+	
 </html>
 
