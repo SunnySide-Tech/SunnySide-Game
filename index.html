@@ -1,107 +1,152 @@
 <html>
+	
 	<head>
+		
 		<title>Our game</title>
+		
 		<style>
+			
 			.modal {
-			  display: none; 
-			  position: fixed; 
-			  z-index: 1;
-			  padding-top: 100px; 
-			  left: 0;
-			  top: 0;
-			  width: 100%; 
-			  height: 100%; 
-			  overflow: auto; 
-			  background-color: rgb(0,0,0); 
-			  background-color: rgba(0,0,0,0.4);
+				
+				display: none; 
+				position: fixed; 
+				z-index: 1;
+				padding-top: 100px; 
+				left: 0;
+				top: 0;
+				width: 100%; 
+				height: 100%; 
+				overflow: auto; 
+				background-color: rgb(0,0,0); 
+				background-color: rgba(0,0,0,0.4);
 			  
 			}
 			
 			.modal-content {
-			  background-color: #fefefe;
-			  margin: auto;
-			  padding: 20px;
-			  border: 1px solid #888;
-			  width: 80%;
+				
+				background-color: #fefefe;
+				margin: auto;
+				padding: 20px;
+				border: 1px solid #888;
+				width: 80%;
+				
 			}
 
 			.close {
-			  color: #aaaaaa;
-			  float: right;
-			  font-size: 28px;
-			  font-weight: bold;
+				
+				color: #aaaaaa;
+				float: right;
+				font-size: 28px;
+				font-weight: bold;
+				
 			}
 
 			.close:hover,
 			.close:focus {
-			  color: #000;
-			  text-decoration: none;
-			  cursor: pointer;
+				
+				color: #000;
+				text-decoration: none;
+				cursor: pointer;
+				
 			}
+			
 			#startButton {
+				
 				width: 300px;
 				height: 70px;
 				background-color: white; 
 				color: black; 
 				border: 2px solid #f44336;
 				margin-top: 230px;
+				
 			}
+			
 			#startButton:hover {
-			  background-color: #f44336;
-			  color: white;
-			  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+				
+				background-color: #f44336;
+				color: white;
+				box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
 
 			}
+			
 			body {
+				
 				background-image: url("doggo.png");
+				
 			}
+			
 			#nextPage {
+				
 				background-color: white; 
 				color: black; 
+				
 			}
+			
 		</style>
+		
 	</head>
+	
 	<body align="center">
+		
 		<button id="startButton">Start Game</button>
-		<div id="popUp" class="modal">
-		  <div class="modal-content">
-    <span class="close">&times;</span>
-    <p align="center">Instructions!</p>
-	Welcome to DoggoMania, please enter your name to begin!<p>
+		<div id="popUp" class="modal">	
+		<div class="modal-content">
+		<span class="close">&times;</span>
+			
+		<p align="center">Instructions!</p>
+			
+		Welcome to DoggoMania, please enter your name to begin!<p>
+			
 		<form>
+			
 			<input type = "text" id = "name" placeholder = "Your name..."></input>
+			
 		</form>
+			
 		<button id="nextPage" onclick="playButton()">Play</button>
-		  </div>
+			
 		</div>
-	<script>
-		var modal, btn, span, userName;
-		// Call back to modal
-		modal = document.getElementById('popUp');
+		</div>
+	
+		<script>
 
-		// the start button that opens the modal
-		btn = document.getElementById("startButton");
+			var modal, btn, span, userName;
 
-		// Get the <span> element that closes the modal
-		span = document.getElementsByClassName("close")[0];
+			// Call back to modal
+			modal = document.getElementById('popUp');
 
-		// When the user clicks the button, open the modal 
-		btn.onclick = function() {
-		  modal.style.display = "block";
-		}
+			// the start button that opens the modal
+			btn = document.getElementById("startButton");
 
-		// When the user clicks on <span> (x), close the modal
-		span.onclick = function() {
-		  modal.style.display = "none";
-		}
-		function playButton() { //intervariable for user's name
-			location.replace("bestcopy.html");
-						
-			userName = document.getElementById("name").value;
-								
-			localStorage.setItem("name", userName);
-		}
+			// Get the <span> element that closes the modal
+			span = document.getElementsByClassName("close")[0];
 
-	</script>
+			// When the user clicks the button, open the modal 
+			btn.onclick = function() {
+
+				modal.style.display = "block";
+
+			}
+
+			// When the user clicks on <span> (x), close the modal
+			span.onclick = function() {
+
+				modal.style.display = "none";
+
+			}
+
+			function playButton() { //intervariable for user's name
+
+				location.replace("bestcopy.html");
+
+				userName = document.getElementById("name").value;
+
+				localStorage.setItem("name", userName);
+
+			}
+
+		</script>
+	
 	</body>
+
 </html>
