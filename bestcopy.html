@@ -2,82 +2,22 @@
 	
 	<head>
 		
-		<title>Our game</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		
 		<style>
-			
-			.modal {
+		
+			canvas {
 				
-			  display: none; 
-			  position: fixed; 
-			  z-index: 1;
-			  padding-top: 100px; 
-			  left: 0;
-			  top: 0;
-			  width: 100%; 
-			  height: 100%; 
-			  overflow: auto; 
-			  background-color: rgb(0,0,0); 
-			  background-color: rgba(0,0,0,0.4);
-			  
-			}
-			
-			.modal-content {
-				
-			  background-color: #fefefe;
-			  margin: auto;
-			  padding: 20px;
-			  border: 1px solid #888;
-			  width: 80%;
+				border:1px solid #d3d3d3;
+				background-color: #f1f1f1;
 				
 			}
 			
-			.close {
+			html, body {
 				
-			  color: #aaaaaa;
-			  float: right;
-			  font-size: 28px;
-			  font-weight: bold;
-				
-			}
-			
-			.close:hover,
-			
-			.close:focus {
-				
-			  color: #000;
-			  text-decoration: none;
-			  cursor: pointer;
-				
-			}
-			#startButton {
-				
-				width: 300px;
-				height: 70px;
-				background-color: white; 
-				color: black; 
-				border: 2px solid #f44336;
-				margin-top: 230px;
-			}
-			
-			#startButton:hover {
-				
-			  background-color: #f44336;
-			  color: white;
-			  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
-				
-			}
-			
-			body {
-				
-				background-image: url("doggo.png");
-				
-			}
-			
-			#nextPage {
-				
-				background-color: white; 
-				color: black; 
+				width:  100%;
+				height: 100%;
+				margin: 0;
 				
 			}
 			
@@ -85,67 +25,299 @@
 		
 	</head>
 	
-	<body align="center">
+	<body onload="startGame()">
 		
-		<button id="startButton">Start Game</button>
-		<div id="popUp" class="modal">
-		<div class="modal-content">
-			
-		<span class="close">&times;</span>
-		<p align="center">Instructions!</p>
-			
-		Welcome to DoggoRun. Move the dog and avoid the obstacles! If you crash, game over! In order to win, try to get to the other side of the screen as fast as possible. Good luck! Please enter your name to begin!<p>
-		
-		<form>
-			
-			<input type = "text" id = "name" placeholder = "Your name..."></input>
-			
-		</form>
-			
-		<button id="nextPage" onclick="playButton()">Play</button>
-			
-		</div>
-		</div>
-	
 		<script>
-
-			var modal, btn, span, userName;
-
-			// Call back to modal
-			modal = document.getElementById('popUp');
-
-			// the start button that opens the modal
-			btn = document.getElementById("startButton");
-
-			// Get the <span> element that closes the modal
-			span = document.getElementsByClassName("close")[0];
-
-			// When the user clicks the button, open the modal 
-			btn.onclick = function() {
-
-				modal.style.display = "block";
-
+			
+			var myDog, time, myBackground, a, b, c, radius, left, right, top, bottom, otherLeft, otherRight, otherBottom, otherTop, crash, ctx, userName;
+			
+			var obstacles = []; //defining multiple obstacles
+			var randomInterval = Math.floor((Math.random() * 150) + 100);
+			
+			function startGame() {
+				
+				myDog = new component(130, 80, "huskyDrawing.png", 30, 180, "image"); //handrawn doggy
+				myBackground = new component(1510, 730, "snow.jpg", 0, 0, "backgroundPic"); //1510 px wide, 730 px high, 0 px to the right and left
+				obstacles.push(new component(100, 100, "SunnySide_ShrubFlowers.png", 300, 350, "obstacle")); //inserts obstacle into array
+				time = new component("30px", "Consolas", "black", 30, 30, "text");
+				myGameArea.start();		
+				
 			}
-
-			// When the user clicks on <span> (x), close the modal
-			span.onclick = function() {
-
-				modal.style.display = "none";
-
+			
+			
+			var myGameArea = {
+			
+				canvas : document.createElement("canvas"),
+				
+				start : function() { //creates canvas and starts game
+				
+					this.canvas.width = window.innerWidth;
+					this.canvas.height = window.innerHeight;
+					this.context = this.canvas.getContext("2d");			
+					document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+					this.frameNo = 0; //to generate more obstacles at a given frame rate
+					this.interval = setInterval(updateGameArea, 20);
+					
+				},
+				
+				clear : function() {
+				
+					this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+					
+				},
+				
+				stop : function() { //ends game, will be used in the crash function
+				
+					clearInterval(this.interval);
+					
+				}
+				
 			}
+			
+			function component(width, height, photo, x, y, type) {
+			
+				this.type = type;
+				
+				 if (type == "image" || type == "backgroundPic"||type == "obstacle") {
+				 
+					this.image = new Image();
+					this.image.src = photo;
+					
+				 }
+				
+				this.width = width;
+				this.height = height;
+				this.speedX = 0;
+				this.speedY = 0;    
+				this.x = x;
+				this.y = y; 
+				this.score = 0;
+				
+				this.update = function() { //creates update which will later on be used when updating/drawing number of obstacles, background picture and/or score
+				
+					ctx = myGameArea.context;
+					if (type == "image"||type == "backgroundPic"||type == "obstacle") {
+							
+						ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
 
-			function playButton() { //intervariable for user's name
+						if (type == "backgroundPic") {
 
-				location.replace("bestcopy.html");
+							ctx.drawImage(this.image, this.x + this.width, this.y, this.width, this.height);
 
-				userName = document.getElementById("name").value;
-
-				localStorage.setItem("name", userName);
-
-			}
+						}
+								  
+					} else if (this.type == "text") {
+						
+							ctx.font = this.width + " " + this.height;
+							ctx.fillStyle = photo;
+							ctx.fillText(this.text, this.x, this.y);
+							
+					} else {
+						
+						ctx.fillStyle = photo;
+						ctx.fillRect(this.x, this.y, this.width, this.height);
+						
+					}
+					
+				} 
+					
+				this.newPos = function() {
+				
+					this.x += this.speedX;
+					this.y += this.speedY; 
+					
+					if (this.type == "backgroundPic"||this.type == "obstacle") {
+					
+					 	if (this.x == -(this.width)) {
+					  
+							this.x = 0;
+						
+					   	}
+					  
+					}	
+					
+				}
+				
+				   this.crash = function(otherobj) {
+					   
+					var myleft = this.x;
+					var myright = this.x + (this.width);
+					var mytop = this.y;
+					var mybottom = this.y + (this.height);
+					var otherleft = otherobj.x;
+					var otherright = otherobj.x + (otherobj.width);
+					var othertop = otherobj.y;
+					var otherbottom = otherobj.y + (otherobj.height);
+					var crash = true;
+					   
+					if ((mybottom < othertop) ||
+					(mytop > otherbottom) ||
+					(myright < otherleft) ||
+					(myleft > otherright)) {
+						
+						crash = false;
+						
+					}
+					   
+					return crash;
+					   
+				  }
+				
+			}	
+				
+			function everyInterval(n) {
+			
+				if ((myGameArea.frameNo / n) % 1 == 0) {
 		
-		</script>
-	
-	</body>
+					return true;
+				
+				}
+			  
+				return false;
+			  
+			}
+			
+			function updateGameArea() {
+		
+				var distance, height, gap, minHeight, maxHeight, minGap, maxGap, y, width, minWidth;
+				var ycoord, maxycoord, minycoord;
+				
+				for (var i = 0; i < obstacles.length; i += 1) {
+					
+					if (myDog.crash(obstacles[i])) {
+						
+						userName = localStorage.getItem("name"); //intervariable for ICSgame.html page
+						
+						if (userName == null) userName = ""
+						
+						alert("You lost :(...Better luck next time! Thank you for playing, " + userName + "!");
+						
+						myGameArea.stop();
+						
+						return;
+					  
+					} 
+					
+					if (myDog.x == window.innerWidth) {
+						
+						userName = localStorage.getItem("name"); //intervariable for ICSgame.html page
+						
+						if(userName==null) userName = ""
+						
+						alert("You won! Thank you for playing, " + userName + "! Your score is:" + myGameArea.frameNo);
+						
+						myGameArea.stop();
+						
+						return;
+					  
+					}
+					
+					if (myDog.y == window.height|| myDog.y == 0) {
+						
+						userName = localStorage.getItem("name"); //intervariable for ICSgame.html page
+						
+						if(userName==null) userName = ""
+						
+						alert("You lost :(...Better luck next time! Thank you for playing, " + userName + "!");
+						
+						myGameArea.stop();
+						
+						return;
+						
+					}
+					
+				}
+				
+				myGameArea.clear(); //so that the components do not leave a trail behind on canvas
+				myGameArea.frameNo += 1;
+				myBackground.speedX = -1;
+				myBackground.newPos();    //so the background image is continuous
+				myBackground.update();
+				
+				if ((myGameArea.frameNo == 1)|| (everyInterval(randomInterval))) { //so that the obstacle appears after certain intervals
 
+					distance = myGameArea.frameNo * 2;
+					minHeight = 50; minycoord=10;
+					maxHeight = 200; maxycoord=450;
+					ycoord = Math.floor((Math.random()*maxycoord)+minycoord);
+					height = Math.floor((Math.random()*(maxHeight-minHeight+1))+minHeight); //randomizes height of the component
+					minGap = 140;
+					maxGap = 150;
+					gap = Math.floor((Math.random()*(maxGap-minGap+1))+minGap);
+					
+					obstacles.push(new component(100, Math.max(Math.min((distance - height - gap),maxHeight), minHeight), "SunnySide_Snowman.png", myDog.x +gap, ycoord , "obstacle"));//adds component properties to the end of the array
+				
+				}
+
+				for (var w = 0; w < obstacles.length; w += 1) {
+
+					obstacles[w].distance += 1; //chooses which obstacles property to display
+					obstacles[w].update(); //updates and adds new one to canvas
+
+				}
+								
+				time.text = "SCORE: " + myGameArea.frameNo;
+				time.update();
+				
+				myDog.newPos();    
+				myDog.update();
+				
+			}	
+			
+		
+			
+			function moveup() {
+			
+				myDog.speedY = -3; 
+				
+			}
+			
+			function movedown() {
+			
+				myDog.speedY = 3; 
+				
+			}
+			
+			function moveleft() {
+			
+				myDog.speedX = -3; 
+				
+			}
+			
+			function moveright() {
+			
+				myDog.speedX = 3; 
+				
+			}
+			
+			document.onkeydown = function(evt) { //connecting the dog to arrows on keyboard
+			
+				evt = evt || window.event; 
+				
+				switch (evt.keyCode) { 
+				
+					case 37:
+					moveleft(); 
+					break; 
+					 
+					case 38:
+					moveup(); 
+					break;
+					
+					case 39:
+					moveright(); 
+					break; 
+					
+					case 40:
+					movedown(); 
+					break;
+				
+				} 
+				
+			}	
+			
+		</script>
+		
+	</body>
+	
 </html>
